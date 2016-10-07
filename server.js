@@ -66,9 +66,17 @@ http.createServer((request, response) => {
 
   if(request.method === 'POST'){
 
-    request.on('data',(data)=>{
+    let bufferToString;
+    request.on('data',(data) =>{
 
-      const parsedData = qs.parse(data.toString());
+      bufferToString = data.toString();
+
+    });
+
+    request.on('end',()=>{
+
+      const parsedData = qs.parse(bufferToString);
+
       const fileName = './public/'+parsedData.elementName.toLowerCase() + '.html';
 
 
@@ -89,10 +97,59 @@ http.createServer((request, response) => {
 </body>
 </html>
 `;
-    fs.writeFile(fileName, html);
+      fs.writeFile(fileName, html, (err)=>{
+        if (err){
+          response.end(err.message);
 
-      response.end(html);
+        }else{
+          let statusCode = 200;
+
+          response.writeHead(statusCode, {
+            'Content-Type': 'application/json',
+          });
+          response.end(JSON.stringify({'success':true}));
+
+        }
+
+      });
+
     });
+
+    let updatedIndexHTML =
+    `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Elements</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <h1>The Elements</h1>
+  <h2>These are all the known elements.</h2>
+  <h3>These are 2</h3>
+  <ol>
+    <li>
+      <a href="/hydrogen.html">Hydrogen</a>
+    </li>
+    <li>
+      <a href="/helium.html">Helium</a>
+    </li>
+     <li>
+      <a href="/boron.html">Boron</a>
+    </li>
+  </ol>
+</body>
+</html>`;
+
+    fs.writeFile('./public/index.html',updatedIndexHTML, (err)=>{
+      if (err){
+        response.end(err.message);
+      }
+
+    });
+
+
+
 
   }
 
@@ -109,18 +166,3 @@ http.createServer((request, response) => {
 
 
 
-// http.createServer(function(request, response) {
-//   var headers = request.headers;
-//   var method = request.method;
-//   var url = request.url;
-//   var body = [];
-//   request.on('error', function(err) {
-//     console.error(err);
-//   }).on('data', function(chunk) {
-//     body.push(chunk);
-//   }).on('end', function() {
-//     body = Buffer.concat(body).toString();
-//     // At this point, we have the headers, method, url and body, and can now
-//     // do whatever we need to in order to respond to this request.
-//   });
-// }).listen(8080); // Activates this server, listening on port 8080.
