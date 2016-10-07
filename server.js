@@ -227,6 +227,37 @@ console.log(request.url);
   }
 
   if(request.method === 'DELETE'){
+    let bufferData;
+    request.on('data', (data)=>{
+
+      bufferData = data.toString();
+
+    });
+
+    request.on('end', ()=>{
+      const parsedThing = qs.parse(bufferData);
+      const filePath = './public/'+parsedThing.elementName.toLowerCase() + '.html';
+
+      fs.unlink(filePath, (err)=>{
+        if (err){
+           let statusCode = 500;
+
+
+          response.writeHead(statusCode, {
+            'Content-Type': 'application/json',
+          });
+
+          response.end(JSON.stringify({'error' : 'resource' + filePath + ' does not exist' }));
+
+        }else{
+          response.writeHead(200, {
+              'Content-Type' : 'application/json'
+            });
+          response.end(JSON.stringify({ 'success' : true }));
+        }
+
+      });
+    });
 
   }
 
