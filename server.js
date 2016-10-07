@@ -69,13 +69,27 @@ http.createServer((request, response) => {
     request.on('data',(data)=>{
 
       const parsedData = qs.parse(data.toString());
-      console.log(parsedData);
+      const fileName = './public/'+parsedData.elementName.toLowerCase() + '.html';
+
 
       let html=
-      `<h1>${parsedData.elementName}</h1>
-      <h2>${parsedData.elementSymbol}</h2>
-      <h3>${parsedData.elementAtomicNumber}</h3>
-      <h4>${parsedData.elementDescription}</h4>`;
+      `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Elements - ${parsedData.elementName}</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <h1>${parsedData.elementName}</h1>
+  <h2>${parsedData.elementSymbol}</h2>
+  <h3>Atomic number ${parsedData.elementAtomicNumber}</h3>
+  <p>${parsedData.elementDescription}.</p>
+  <p><a href="/">back</a></p>
+</body>
+</html>
+`;
+    fs.writeFile(fileName, html);
 
       response.end(html);
     });
