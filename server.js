@@ -134,9 +134,7 @@ console.log(request.url);
     <li>
       <a href="/helium.html">Helium</a>
     </li>
-     <li>
-      <a href="/boron.html">Boron</a>
-    </li>
+    <!--  -->
   </ol>
 </body>
 </html>`;
